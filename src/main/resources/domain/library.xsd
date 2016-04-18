@@ -1,0 +1,116 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tsystems.com/dfmg/studies/library/datasource/domain"
+           targetNamespace="http://tsystems.com/dfmg/studies/library/datasource/domain" elementFormDefault="qualified">
+
+    <xs:complexType name="bookDetailed">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="description" type="xs:string" nillable="true"/>
+            <xs:element name="author" type="xs:string"/>
+            <xs:element name="pages" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="book">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="author" type="xs:string"/>
+            <xs:element name="pages" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="bookListPage">
+        <xs:sequence>
+            <xs:element name="offset" type="xs:int"/>
+            <xs:element name="total" type="xs:int"/>
+            <xs:element name="books" type="tns:book" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="createRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="title" type="xs:string"/>
+                <xs:element name="description" type="xs:string" nillable="true"/>
+                <xs:element name="author" type="xs:string"/>
+                <xs:element name="pages" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="createResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="book" type="tns:bookDetailed"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="readDetailedRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="readDetailedResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="book" type="tns:bookDetailed"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="readListPageRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="offset" type="xs:int"/>
+                <xs:element name="limit" type="xs:int"/>
+                <xs:element name="titleFilter" type="xs:string" nillable="true"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="readListPageResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="page" type="tns:bookListPage"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="updateRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+                <xs:element name="title" type="xs:string"/>
+                <xs:element name="description" type="xs:string" nillable="true"/>
+                <xs:element name="author" type="xs:string"/>
+                <xs:element name="pages" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="updateResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="book" type="tns:bookDetailed"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="deleteRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="deleteResponse">
+        <xs:complexType>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
