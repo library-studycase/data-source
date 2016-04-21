@@ -1,6 +1,9 @@
 package com.tsystems.dfmg.studies.library.datasource.domain;
 
+import com.tsystems.dfmg.studies.library.datasource.UserContext;
+import com.tsystems.dfmg.studies.library.datasource.UserContextBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -14,6 +17,9 @@ public class LibraryEndpoint {
     private final BookRepository repository;
 
     @Autowired
+    private UserContext userContext;
+
+    @Autowired
     public LibraryEndpoint(BookRepository repository) {
         this.repository = repository;
     }
@@ -21,6 +27,9 @@ public class LibraryEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "createRequest")
     @ResponsePayload
     public CreateResponse create(@RequestPayload CreateRequest request) {
+        if (!userContext.getUser().getRoles().contains("Create")) {
+            throw new SecurityException("you do not have permission to create books");
+        }
         CreateResponse response = new CreateResponse();
         response.setBook(repository.add(request.getTitle(), request.getDescription(), request.getAuthor(), request.getPages()));
         return response;
@@ -29,6 +38,9 @@ public class LibraryEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "readDetailedRequest")
     @ResponsePayload
     public ReadDetailedResponse readDetailed(@RequestPayload ReadDetailedRequest request) {
+        if (!userContext.getUser().getRoles().contains("Read")) {
+            throw new SecurityException("you do not have permission to read books");
+        }
         ReadDetailedResponse response = new ReadDetailedResponse();
         response.setBook(repository.get(request.getId()));
         return response;
@@ -37,6 +49,9 @@ public class LibraryEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "readListPageRequest")
     @ResponsePayload
     public ReadListPageResponse readListPage(@RequestPayload ReadListPageRequest request) {
+        if (!userContext.getUser().getRoles().contains("Read")) {
+            throw new SecurityException("you do not have permission to read books");
+        }
         ReadListPageResponse response = new ReadListPageResponse();
         response.setPage(repository.getPage(request.getOffset(), request.getLimit(), request.getTitleFilter()));
         return response;
@@ -45,6 +60,9 @@ public class LibraryEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "updateRequest")
     @ResponsePayload
     public UpdateResponse update(@RequestPayload UpdateRequest request) {
+        if (!userContext.getUser().getRoles().contains("Update")) {
+            throw new SecurityException("you do not have permission to update books");
+        }
         UpdateResponse response = new UpdateResponse();
         response.setBook(repository.update(request.getId(), request.getTitle(), request.getDescription(),
                 request.getAuthor(), request.getPages()));
@@ -54,6 +72,9 @@ public class LibraryEndpoint {
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "deleteRequest")
     @ResponsePayload
     public DeleteResponse delete(@RequestPayload DeleteRequest request) {
+        if (!userContext.getUser().getRoles().contains("Delete")) {
+            throw new SecurityException("you do not have permission to delete books");
+        }
         repository.remove(request.getId());
         return new DeleteResponse();
     }

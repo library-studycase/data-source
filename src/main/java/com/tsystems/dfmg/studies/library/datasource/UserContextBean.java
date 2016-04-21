@@ -1,5 +1,6 @@
 package com.tsystems.dfmg.studies.library.datasource;
 
+import com.tsystems.dfmg.studies.library.datasource.domain.User;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;

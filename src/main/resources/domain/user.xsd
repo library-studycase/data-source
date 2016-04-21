@@ -1,0 +1,81 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tsystems.com/dfmg/studies/library/datasource/domain"
+           targetNamespace="http://tsystems.com/dfmg/studies/library/datasource/domain" elementFormDefault="qualified">
+
+    <xs:complexType name="user">
+        <xs:sequence>
+            <xs:element name="id" type="xs:long"/>
+            <xs:element name="login" type="xs:string"/>
+            <xs:element name="password" type="xs:string"/>
+            <xs:element name="roles" type="xs:string" maxOccurs="unbounded"/>
+            <xs:element name="created" type="xs:dateTime"/>
+            <xs:element name="lastModified" type="xs:dateTime"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="createUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="login" type="xs:string"/>
+                <xs:element name="password" type="xs:string"/>
+                <xs:element name="roles" type="xs:string" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="createUserResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="user" type="tns:user"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="readUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="readUserResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="book" type="tns:user"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="updateUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+                <xs:element name="login" type="xs:string"/>
+                <xs:element name="password" type="xs:string"/>
+                <xs:element name="roles" type="xs:string" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="updateUserResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="book" type="tns:user"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="deleteUserRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:long"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="deleteUserResponse">
+        <xs:complexType>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

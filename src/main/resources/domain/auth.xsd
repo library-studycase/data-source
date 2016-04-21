@@ -1,0 +1,31 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://tsystems.com/dfmg/studies/library/datasource/domain"
+           targetNamespace="http://tsystems.com/dfmg/studies/library/datasource/domain" elementFormDefault="qualified">
+
+    <xs:complexType name="userBis">
+        <xs:sequence>
+            <xs:element name="nativeId" type="xs:long"/>
+            <xs:element name="login" type="xs:string"/>
+            <xs:element name="roles" type="xs:string" maxOccurs="unbounded"/>
+            <xs:element name="created" type="xs:dateTime"/>
+            <xs:element name="lastModified" type="xs:dateTime"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="readUserBisRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="login" type="xs:string"/>
+                <xs:element name="password" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="readUserBisResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="userBis" type="tns:userBis"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

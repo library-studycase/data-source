@@ -32,17 +32,32 @@ public class WebServiceConfiguration extends WsConfigurerAdapter {
 
     @Bean(name = "library")
     public DefaultWsdl11Definition libraryWsdlDefinition(XsdSchema librarySchema) {
-        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
-        wsdl11Definition.setPortTypeName("LibraryPort");
-        wsdl11Definition.setLocationUri("/soap");
-        wsdl11Definition.setTargetNamespace("http://tsystems.com/dfmg/studies/library/datasource/domain");
-        wsdl11Definition.setSchema(librarySchema);
-        return wsdl11Definition;
+        return getDefaultWsdlDefinition(librarySchema);
+    }
+
+    @Bean(name = "user")
+    public DefaultWsdl11Definition userWsdlDefinition(XsdSchema userSchema) {
+        return getDefaultWsdlDefinition(userSchema);
+    }
+
+    @Bean(name = "auth")
+    public DefaultWsdl11Definition authWsdlDefinition(XsdSchema authSchema) {
+        return getDefaultWsdlDefinition(authSchema);
     }
 
     @Bean
     public XsdSchema librarySchema() {
-        return new SimpleXsdSchema(new ClassPathResource("domain/library.xsd"));
+       return new SimpleXsdSchema(new ClassPathResource("domain/library.xsd"));
+    }
+
+    @Bean
+    public XsdSchema userSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("domain/user.xsd"));
+    }
+
+    @Bean
+    public XsdSchema authSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("domain/auth.xsd"));
     }
 
     @Bean
@@ -53,5 +68,14 @@ public class WebServiceConfiguration extends WsConfigurerAdapter {
     @Override
     public void addInterceptors(List<EndpointInterceptor> interceptors) {
         interceptors.add(securityInterceptor());
+    }
+
+    private DefaultWsdl11Definition getDefaultWsdlDefinition(XsdSchema xsdSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("LibraryPort");
+        wsdl11Definition.setLocationUri("/soap");
+        wsdl11Definition.setTargetNamespace("http://tsystems.com/dfmg/studies/library/datasource/domain");
+        wsdl11Definition.setSchema(xsdSchema);
+        return wsdl11Definition;
     }
 }
