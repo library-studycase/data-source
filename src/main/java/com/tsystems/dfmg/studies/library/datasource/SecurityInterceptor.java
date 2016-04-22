@@ -7,7 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.server.endpoint.MethodEndpoint;
 import org.springframework.ws.server.endpoint.interceptor.EndpointInterceptorAdapter;
+import org.springframework.ws.soap.SoapHeaderElement;
+import org.springframework.ws.soap.saaj.SaajSoapHeaderException;
 import org.springframework.ws.soap.saaj.SaajSoapMessage;
+
+import java.util.Iterator;
 
 public class SecurityInterceptor extends EndpointInterceptorAdapter {
 
@@ -26,14 +30,35 @@ public class SecurityInterceptor extends EndpointInterceptorAdapter {
             }
 
             SaajSoapMessage message = (SaajSoapMessage) messageContext.getRequest();
-            String[] header = message.getSaajMessage().getMimeHeaders().getHeader("Native-Id");
-            if (header != null && header.length > 0) {
-                String nativeId = header[0];
-                userContextConfigurer.setUser(authenticate(nativeId));
-            } else {
-                throw new IllegalArgumentException("auth token missing");
+
+            String nativeId = null;
+
+            if (message.getEnvelope() != null && message.getEnvelope().getHeader() != null) {
+                Iterator<SoapHeaderElement> soapHeaderElementIterator = message.getEnvelope().getHeader().examineAllHeaderElements();
+                while (soapHeaderElementIterator.hasNext()) {
+                    SoapHeaderElement next = soapHeaderElementIterator.next();
+                    if (next.getName().getLocalPart().equalsIgnoreCase("Native-Id")) {
+                        nativeId = next.getText();
+                        break;
+                    }
+                }
             }
+
+            if (nativeId == null) {
+                String[] header = message.getSaajMessage().getMimeHeaders().getHeader("Native-Id");
+                if (header != null && header.length > 0) {
+                    nativeId = header[0];
+                }
+            }
+
+            if (nativeId == null) {
+                throw new IllegalArgumentException("auth token missing");
+            } else {
+                userContextConfigurer.setUser(authenticate(nativeId));
+            }
+
         }
+
         return true;
     }
 
