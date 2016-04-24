@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 @Component
-@Scope(value = "request", proxyMode = ScopedProxyMode.INTERFACES)
+@Scope(scopeName = "request", proxyMode = ScopedProxyMode.INTERFACES)
 public class UserContextBean implements UserContextConfigurer {
 
     private User user;

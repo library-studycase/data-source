@@ -1,5 +1,8 @@
 package com.tsystems.dfmg.studies.library.datasource.domain;
 
+import com.tsystems.dfmg.studies.library.datasource.UserContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +16,13 @@ import java.util.stream.Collectors;
 @Repository
 public class BookRepositoryBean implements BookRepository {
 
+    private static final Log LOGGER = LogFactory.getLog(BookRepositoryBean.class);
+
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<Long, BookDetailed> books = new LinkedHashMap<>();
+
+    @Autowired
+    private UserContext userContext;
 
     @Autowired
     private Function<BookDetailed, Book> reducer;
@@ -30,6 +38,7 @@ public class BookRepositoryBean implements BookRepository {
             if (result == null) {
                 throw new IllegalArgumentException(String.format("no book with such id (%s) was found", id));
             }
+            LOGGER.info(String.format("user %s requested info on book %s", userContext.getUser().getLogin(), id));
             return result;
         } finally {
 
@@ -69,6 +78,7 @@ public class BookRepositoryBean implements BookRepository {
             result.setOffset(offset);
             result.setTotal(filtered.size());
             result.getBooks().addAll(contents);
+            LOGGER.info(String.format("user %s requested range info on books (offset: %s, limit %s, filter: %s)", userContext.getUser().getLogin(), offset, limit, titleFilter));
             return result;
         } finally {
 
@@ -98,6 +108,7 @@ public class BookRepositoryBean implements BookRepository {
             result.setAuthor(author);
             result.setPages(pages);
             books.put(id, result);
+            LOGGER.info(String.format("user %s added a new book %s (%s)", userContext.getUser().getLogin(), id, title));
             return result;
         } finally {
 
@@ -124,6 +135,7 @@ public class BookRepositoryBean implements BookRepository {
             result.setAuthor(author);
             result.setPages(pages);
             books.put(id, result);
+            LOGGER.info(String.format("user %s updated the book %s", userContext.getUser().getLogin(), id));
             return result;
         } finally {
 
@@ -137,6 +149,7 @@ public class BookRepositoryBean implements BookRepository {
             lock.writeLock().lock();
 
             books.remove(get(id).getId());
+            LOGGER.info(String.format("user %s removed the book %s", userContext.getUser().getLogin(), id));
         } finally {
 
             lock.writeLock().unlock();
@@ -145,16 +158,37 @@ public class BookRepositoryBean implements BookRepository {
 
     @PostConstruct
     private void onConstructed() {
-        add("451 По Фаренгейту", "Научно-фантастический роман-антиутопия Рэя Брэдбери, изданный в 1953 году.", "Брэдбери, Р.", 345);
-        add("Шантарам", "Роман австралийского писателя Грегори Дэвида Робертса. Основой для книги послужили события собственной жизни автора. Основное действие романа разворачивается в Индии, в Бомбее (Мумбаи) в 1980-х годах.", "Робертс, Г. Д.", 280);
-        add("1984", "Роман-антиутопия Джорджа Оруэлла, изданный в 1949 году.", "Оруэлл, Д.", 380);
-        add("Мастер И Маргарита", "Роман Михаила Афанасьевича Булгакова, работа над которым началась в конце 1920-х годов и продолжалась вплоть до смерти писателя. Роман относится к незавершённым произведениям.", "Булгаков, М. А.", 507);
-        add("Три Товарища", "Роман Эриха Мария Ремарка, работу над которым он начал в 1932 году. Роман был закончен и опубликован в датском издательстве Gyldendal под названием Kammerater в 1936 году.", "Ремарк, Э. М.", 302);
-        add("Портрет Дориана Грея", "Произведение мировой литературы, единственный опубликованный роман Оскара Уайльда.", "Уайлд, Д.", 329);
-        add("Вино Из Одуванчиков", "Вино из одуванчиков - произведение, выделяющееся среди литературного творчества Рэя Брэдбери личными переживаниями писателя. Это во многом автобиографическая книга, действие которой происходит летом 1928 года в вымышленном городе Грин Таун, штат Иллинойс.", "Бредбери, Р.", 298);
-        add("Убить пересмешника", "Роман американской писательницы Харпер Ли, написанный в жанре воспитательного романа. Опубликован в 1960 году. В 1961 году получил Пулитцеровскую премию.", "Харпер, Л.", 476);
-        add("Маленький Принц", "Аллегорическая повесть, наиболее известное произведение Антуана де Сент-Экзюпери. Впервые опубликована 6 апреля 1943 года в Нью-Йорке.", "Сент-Экзюпери, А.", 217);
-        add("Над Пропастью Во Ржи", "Роман американского писателя Джерома Сэлинджера. В нём от лица 16-летнего юноши по имени Холден в весьма откровенной форме рассказывается о его обострённом восприятии американской действительности и неприятии общих канонов и морали современного общества.", "Сэлинджер, Д. Д.", 362);
-        add("Цветы Для Элджернона", "Научно-фантастический рассказ Дэниела Киза («мягкая» научная фантастика).", "Киз, Д.", 398);
+        addInternal("Fahrenheit 451 ", "Fahrenheit 451 is a dystopian novel by Ray Bradbury published in 1953. It is regarded as one of his best works.", "Bradbury, R.", 345);
+        addInternal("Shantaram", "Shantaram is a 2003 novel by Gregory David Roberts, in which a convicted Australian bank robber and heroin addict who escaped from Pentridge Prison flees to India.", "Roberts, G. D.", 280);
+        addInternal("1984", "Nineteen Eighty-Four, often published as 1984, is a dystopian novel by English author George Orwell published in 1949.", "Orwell, J.", 380);
+        addInternal("The Master And Margarita", "The Master and Margarita (Russian: Мастер и Маргарита) is a novel by Mikhail Bulgakov, written between 1928 and 1940, but unpublished in book form until 1967.", "Bulgakov, M. A.", 507);
+        addInternal("Three Comrades", "Three Comrades (German: Drei Kameraden) is a novel first published in 1936 by the German author Erich Maria Remarque.", "Remarque, E. M.", 302);
+        addInternal("The Picture Of Dorian Gray", "The Picture of Dorian Gray is a philosophical novel by the writer Oscar Wilde, first published complete in the July 1890 issue of Lippincott's Monthly Magazine.", "Wilde, O.", 329);
+        addInternal("Dandelion Wine", "Dandelion Wine is a 1957 novel by Ray Bradbury, taking place in the summer of 1928 in the fictional town of Green Town, Illinois, based upon Bradbury's childhood home of Waukegan, Illinois", "Bradbury, R.", 298);
+        addInternal("To Kill A Mockingbird", "To Kill a Mockingbird is a novel by Harper Lee published in 1960. It was immediately successful, winning the Pulitzer Prize, and has become a classic of modern American literature.", "Harper, L.", 476);
+        addInternal("The Little Prince", "The Little Prince (French: Le Petit Prince), first published in 1943, is a novella, the most famous work of the French aristocrat, writer, poet, and pioneering aviator Antoine de Saint-Exupéry.", "Saint-Exupery, A.", 217);
+        addInternal("The Catcher In The Rye", "The Catcher in the Rye is a 1951 novel by J. D. Salinger. A controversial novel originally published for adults, it has since become popular with adolescent readers for its themes of teenage angst and alienation.", "Salinger, J. D.", 362);
+        addInternal("Flowers For Algernon", "Flowers for Algernon is a science fiction short story and subsequent novel written by Daniel Keyes. The short story, written in 1958 and first published in the April 1959.", "Keyes, D.", 398);
+    }
+
+    private void addInternal(String title, String description, String author, int pages) {
+
+        try {
+
+            lock.writeLock().lock();
+
+            long id = index++;
+
+            BookDetailed result = new BookDetailed();
+            result.setId(id);
+            result.setTitle(title);
+            result.setDescription(description);
+            result.setAuthor(author);
+            result.setPages(pages);
+            books.put(id, result);
+        } finally {
+
+            lock.writeLock().unlock();
+        }
     }
 }

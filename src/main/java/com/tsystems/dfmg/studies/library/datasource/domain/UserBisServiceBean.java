@@ -1,5 +1,7 @@
 package com.tsystems.dfmg.studies.library.datasource.domain;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +11,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
 public class UserBisServiceBean implements UserBisService {
+
+    private static final Log LOGGER = LogFactory.getLog(UserBisServiceBean.class);
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<Long, User> users = new LinkedHashMap<>();
@@ -34,10 +38,10 @@ public class UserBisServiceBean implements UserBisService {
             userBis.roles = User.roles;
             userBis.setCreated(User.getCreated());
             userBis.setLastModified(User.getLastModified());
+            LOGGER.info(String.format("user %s has successfully logged in", userBis.getLogin()));
             return userBis;
         } finally {
             lock.readLock().unlock();
         }
     }
-
 }

@@ -117,18 +117,17 @@ public class UserRepositoryBean implements UserRepository {
                 "admin",
                 "admin",
                 new ArrayList<String>() {{
-                    add("Create");
-                    add("Read");
-                    add("Update");
-                    add("Delete");
+                    add("READER");
+                    add("ADDER");
+                    add("MODIFIER");
                 }}
         );
         add(
                 "user",
                 "user",
                 new ArrayList<String>() {{
-                    add("Read");
-                    add("Update");
+                    add("READER");
+                    add("ADDER");
                 }}
         );
     }
